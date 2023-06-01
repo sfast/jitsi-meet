@@ -77,6 +77,7 @@ interface IProps {
      * The type of th button: primary, secondary, text.
      */
     type: string;
+    onKeyPress?: Function;
 }
 
 const useStyles = makeStyles()(theme => {
@@ -181,16 +182,17 @@ function ActionButton({
     role,
     ariaPressed,
     ariaLabel,
-    ariaDropDownLabel
+    ariaDropDownLabel,
+    onKeyPress,
 }: IProps) {
     const { classes, cx } = useStyles();
 
     const onKeyPressHandler = useCallback(e => {
-        if (onClick && !disabled && (e.key === ' ' || e.key === 'Enter')) {
+        if (onKeyPress && !disabled && (e.key === ' ' || e.key === 'Enter')) {
             e.preventDefault();
-            onClick(e);
+            onKeyPress(e);
         }
-    }, [ onClick, disabled ]);
+    }, [ onKeyPress, disabled ]);
 
     const onOptionsKeyPressHandler = useCallback(e => {
         if (onOptionsClick && !disabled && (e.key === ' ' || e.key === 'Enter')) {

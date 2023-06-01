@@ -205,6 +205,9 @@ window.JitsiMeetScreenObtainer = {
  * Known custom conference commands.
  */
 const commands = {
+    IS_GUEST: 'is-guest',
+    IS_RECORDING: 'is-recording',
+    GUEST_ID: 'guest-id',
     AVATAR_URL: AVATAR_URL_COMMAND,
     CUSTOM_ROLE: 'custom-role',
     EMAIL: EMAIL_COMMAND,
@@ -2070,6 +2073,37 @@ export default {
             this.muteVideo(muted, showUI);
         });
 
+        room.addCommandListener(
+            this.commands.defaults.IS_GUEST,
+            (data, from) => {
+                APP.store.dispatch(
+                    participantUpdated({
+                        conference: room,
+                        id: from,
+                        isGuest: data.value === 'true'
+                    }));
+            });
+        room.addCommandListener(
+            this.commands.defaults.IS_RECORDING,
+            (data, from) => {
+                APP.store.dispatch(
+                    participantUpdated({
+                        conference: room,
+                        id: from,
+                        isRecording: data.value === 'true'
+                    }));
+            });
+        room.addCommandListener(
+            this.commands.defaults.GUEST_ID,
+            (data, from) => {
+                APP.store.dispatch(
+                    participantUpdated({
+                        conference: room,
+                        id: from,
+                        guestId: data.value
+                    }));
+            });
+
         room.addCommandListener(this.commands.defaults.ETHERPAD,
             ({ value }) => {
                 APP.UI.initEtherpad(value);
@@ -2810,6 +2844,42 @@ export default {
      */
     setVideoMuteStatus() {
         APP.UI.setVideoMuted(this.getMyUserId());
+    },
+
+    setUserIsGuest(isGuest) {
+        const { id } = getLocalParticipant(APP.store.getState());
+
+        APP.store.dispatch(participantUpdated({
+            id,
+            local: true,
+            isGuest
+        }));
+
+        sendData(commands.IS_GUEST, isGuest);
+    },
+
+    setUserIsRecording(isRecording) {
+        const { id } = getLocalParticipant(APP.store.getState());
+
+        APP.store.dispatch(participantUpdated({
+            id,
+            local: true,
+            isRecording
+        }));
+
+        sendData(commands.IS_RECORDING, isRecording);
+    },
+
+    setGuestId(guestId) {
+        const { id } = getLocalParticipant(APP.store.getState());
+
+        APP.store.dispatch(participantUpdated({
+            id,
+            local: true,
+            guestId
+        }));
+
+        sendData(commands.GUEST_ID, guestId);
     },
 
     /**

@@ -32,6 +32,7 @@ import { parseJWTFromURLParams } from '../../react/features/base/jwt/functions';
 import JitsiMeetJS, { JitsiRecordingConstants } from '../../react/features/base/lib-jitsi-meet';
 import { MEDIA_TYPE, VIDEO_TYPE } from '../../react/features/base/media/constants';
 import {
+    muteRemoteParticipant,
     grantModerator,
     kickParticipant,
     overwriteParticipantsNames,
@@ -66,7 +67,7 @@ import {
     setPrivateMessageRecipient,
     toggleChat
 } from '../../react/features/chat/actions';
-import { openChat } from '../../react/features/chat/actions.web';
+import { openChat, closeChat, openSideToolBar, closeSideToolBar } from '../../react/features/chat/actions.web';
 import {
     processExternalDeviceRequest
 } from '../../react/features/device-selection/functions';
@@ -114,6 +115,10 @@ import { setTileView, toggleTileView } from '../../react/features/video-layout/a
 import { muteAllParticipants } from '../../react/features/video-menu/actions';
 import { setVideoQuality } from '../../react/features/video-quality/actions';
 import { getJitsiMeetTransport } from '../transport';
+
+import { isScreenVideoShared } from '../../react/features/screen-share/functions';
+import { setFilmstripVisible } from '../../react/features/filmstrip/actions';
+import { joinConference } from '../../react/features/prejoin/actions';
 
 import {
     API_ID,
@@ -206,6 +211,12 @@ function initCommands() {
         'local-subject': localSubject => {
             sendAnalytics(createApiEvent('local.subject.changed'));
             APP.store.dispatch(setLocalSubject(localSubject));
+        },
+        'mute-participant': participant => {
+            participant?.id && APP.store.dispatch(muteRemoteParticipant(participant.id, 'audio'))
+        },
+        'join-conference': () => {
+            APP.store.dispatch(joinConference())
         },
         'mute-everyone': mediaType => {
             const muteMediaType = mediaType ? mediaType : MEDIA_TYPE.AUDIO;
@@ -417,6 +428,23 @@ function initCommands() {
         'toggle-chat': () => {
             sendAnalytics(createApiEvent('chat.toggled'));
             APP.store.dispatch(toggleChat());
+            APP.store.dispatch(resizeLargeVideo());
+        },
+        'open-side-tool-bar': () => {
+            APP.store.dispatch(openSideToolBar());
+            APP.store.dispatch(resizeLargeVideo());
+        },
+        'close-side-tool-bar': () => {
+            APP.store.dispatch(closeSideToolBar());
+            APP.store.dispatch(resizeLargeVideo());
+        },
+        'open-chat': () => {
+            APP.store.dispatch(openChat());
+            APP.store.dispatch(resizeLargeVideo());
+        },
+        'close-chat': () => {
+            APP.store.dispatch(closeChat());
+            APP.store.dispatch(resizeLargeVideo());
         },
         'toggle-moderation': (enabled, mediaType) => {
             const state = APP.store.getState();
@@ -505,6 +533,18 @@ function initCommands() {
         'avatar-url': avatarUrl => {
             sendAnalytics(createApiEvent('avatar.url.changed'));
             APP.conference.changeLocalAvatarUrl(avatarUrl);
+        },
+        'is-guest': isGuest => {
+            APP.conference.setUserIsGuest(isGuest === 'true');
+        },
+        'is-recording': isRecording => {
+            APP.conference.setUserIsRecording(isRecording === 'true');
+        },
+        'set-filmstrip': visible => {
+            APP.store.dispatch(setFilmstripVisible(visible));
+        },
+        'guest-id': guestId => {
+            APP.conference.setGuestId(guestId);
         },
         'send-chat-message': (message, to, ignorePrivacy = false) => {
             logger.debug('Send chat message command received');
@@ -1163,6 +1203,37 @@ class API {
             name: 'outgoing-message',
             message,
             privateMessage
+        });
+    }
+
+    notifyParticipantAudioLevelUpdated(id, { value }) {
+        this._sendEvent({
+            name: 'participant-audio-level-updated',
+            id,
+            value,
+        });
+    }
+
+    notifyJoinMeetingButtonClicked(displayName) {
+        this._sendEvent({
+            name: 'join-meeting-button-clicked',
+            displayName,
+        });
+    }
+
+    notifyJoinMeetingButtonCanceled(displayName) {
+        this._sendEvent({
+            name: 'join-meeting-button-canceled',
+            displayName,
+        });
+    }
+
+    notifyParticipantUpdated(id, { fieldName, value }) {
+        this._sendEvent({
+            name: 'participant-updated',
+            id,
+            value,
+            fieldName,
         });
     }
 

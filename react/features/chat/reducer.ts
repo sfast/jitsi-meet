@@ -13,7 +13,9 @@ import {
     SET_IS_POLL_TAB_FOCUSED,
     SET_LOBBY_CHAT_ACTIVE_STATE,
     SET_LOBBY_CHAT_RECIPIENT,
-    SET_PRIVATE_MESSAGE_RECIPIENT
+    SET_PRIVATE_MESSAGE_RECIPIENT,
+    CLOSE_SIDE_TOOL_BAR,
+    OPEN_SIDE_TOOL_BAR
 } from './actionTypes';
 
 const DEFAULT_STATE = {
@@ -24,7 +26,9 @@ const DEFAULT_STATE = {
     nbUnreadMessages: 0,
     privateMessageRecipient: undefined,
     lobbyMessageRecipient: undefined,
-    isLobbyChatActive: false
+    isLobbyChatActive: false,
+    sideToolBarIsOpen: false,
+    sideToolBarWidth: 338,
 };
 
 export interface IMessage {
@@ -53,6 +57,8 @@ export interface IChatState {
     messages: IMessage[];
     nbUnreadMessages: number;
     privateMessageRecipient?: IParticipant;
+    sideToolBarIsOpen: Boolean;
+    sideToolBarWidth?: number;
 }
 
 ReducerRegistry.register<IChatState>('features/chat', (state = DEFAULT_STATE, action): IChatState => {
@@ -91,6 +97,18 @@ ReducerRegistry.register<IChatState>('features/chat', (state = DEFAULT_STATE, ac
             messages
         };
     }
+    
+    case CLOSE_SIDE_TOOL_BAR:
+        return {
+            ...state,
+            isOpen: false,
+            sideToolBarIsOpen: false
+        };
+    case OPEN_SIDE_TOOL_BAR:
+        return {
+            ...state,
+            sideToolBarIsOpen: true
+        };
 
     case CLEAR_MESSAGES:
         return {

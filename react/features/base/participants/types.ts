@@ -39,6 +39,9 @@ export interface IParticipant {
     role?: string;
     sources?: Map<string, Map<string, ISourceInfo>>;
     supportsRemoteControl?: boolean;
+    isGuest?: boolean;
+    guestId?: string;
+    isRecording?: boolean;
 }
 
 export interface ILocalParticipant extends IParticipant {

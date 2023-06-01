@@ -45,7 +45,8 @@ import {
     PARTICIPANT_LEFT,
     PARTICIPANT_UPDATED,
     RAISE_HAND_UPDATED,
-    SET_LOCAL_PARTICIPANT_RECORDING_STATUS
+    SET_LOCAL_PARTICIPANT_RECORDING_STATUS,
+    PIN_PARTICIPANT
 } from './actionTypes';
 import {
     localParticipantIdChanged,
@@ -124,6 +125,36 @@ MiddlewareRegistry.register(store => next => action => {
         break;
     }
 
+    case PIN_PARTICIPANT: {
+        const state = store.getState()['features/base/participants'];
+
+        const { participant } = action;
+        const { id } = participant;
+        const { pinnedParticipant } = state;
+
+        if (id && !pinnedParticipant) {
+            APP.API.notifyParticipantUpdated(id, {
+                fieldName: 'pinned',
+                value: true,
+            });
+        }
+
+        else if (id && pinnedParticipant) {
+            APP.API.notifyParticipantUpdated(id, {
+                fieldName: 'pinned',
+                value: id !== pinnedParticipant,
+            })
+        }
+
+        else if(pinnedParticipant && !id) {
+            APP.API.notifyParticipantUpdated(pinnedParticipant, {
+                fieldName: 'pinned',
+                value: false,
+            })
+        }
+
+        break;
+    }
     case LOCAL_PARTICIPANT_AUDIO_LEVEL_CHANGED: {
         const state = store.getState();
         const participant = getDominantSpeakerParticipant(state);
@@ -634,15 +665,23 @@ function _maybePlaySounds({ getState, dispatch }: IStore, action: any) {
 function _participantJoinedOrUpdated(store: IStore, next: Function, action: any) {
     const { dispatch, getState } = store;
     const { overwrittenNameList } = store.getState()['features/base/participants'];
-    const { participant: {
-        avatarURL,
-        email,
-        id,
-        local,
-        localRecording,
-        name,
-        raisedHandTimestamp
-    } } = action;
+    const { participant: { pinned, guestId, isGuest, isRecording, avatarURL, email, id, local, name, raisedHandTimestamp, localRecording } } = action;
+
+    if (typeof isGuest === 'boolean' && id !== 'local') {
+        APP.API.notifyParticipantUpdated(action.participant.id, { fieldName: 'isGuest', value: isGuest });
+    }
+
+    if (typeof isRecording === 'boolean' && id !== 'local') {
+        APP.API.notifyParticipantUpdated(action.participant.id, { fieldName: 'isRecording', value: isRecording });
+    }
+
+    if (guestId && id !== 'local') {
+        APP.API.notifyParticipantUpdated(action.participant.id, { fieldName: 'guestId', value: guestId });
+    }
+
+    if (typeof pinned === 'boolean') {
+        APP.API.notifyParticipantUpdated(action.participant.id, { fieldName: 'pinned', value: pinned });
+    }
 
     // Send an external update of the local participant's raised hand state
     // if a new raised hand state is defined in the action.

@@ -23,6 +23,7 @@ function KeyboardAvoider() {
      * @returns {void}
      */
     function handleViewportResize() {
+        // @ts-ignore
         const { innerWidth, visualViewport: { width, height } } = window;
 
         // Compare the widths to make sure the {@code visualViewport} didn't resize due to zooming.
@@ -39,10 +40,12 @@ function KeyboardAvoider() {
     useEffect(() => {
         // Call the handler in case the keyboard is open when the {@code KeyboardAvoider} is mounted.
         handleViewportResize();
+                // @ts-ignore
 
         window.visualViewport.addEventListener('resize', handleViewportResize);
 
         return () => {
+                // @ts-ignore
             window.visualViewport.removeEventListener('resize', handleViewportResize);
         };
     }, []);

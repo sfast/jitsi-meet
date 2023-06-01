@@ -27,6 +27,21 @@ const ALWAYS_ON_TOP_FILENAMES = [
  * commands expected by jitsi-meet.
  */
 const commands = {
+    setFilmstrip: 'set-filmstrip',
+    joinConference: 'join-conference',
+
+    isGuest: 'is-guest',
+    isRecording: 'is-recording',
+    guestId: 'guest-id',
+
+    openChat: 'open-chat',
+    closeChat: 'close-chat',
+    openSideToolBar: 'open-side-tool-bar',
+    closeSideToolBar: 'close-side-tool-bar',
+    muteParticipant: 'mute-participant',
+    startScreenShare: 'start-screen-share',
+    stopScreenShare: 'stop-screen-share',
+
     addBreakoutRoom: 'add-breakout-room',
     answerKnockingParticipant: 'answer-knocking-participant',
     approveVideo: 'approve-video',
@@ -98,6 +113,15 @@ const commands = {
  * events expected by jitsi-meet.
  */
 const events = {
+    'join-meeting-button-clicked': 'joinButtonClicked',
+    'join-meeting-button-canceled': 'joinButtonCanceled',
+
+    'participant-updated': 'participantUpdated',
+    'participant-audio-level-updated': 'participantAudioLevelUpdated',
+
+    'toolbar-button-clicked': 'toolbarButtonClicked',
+    'conference-disposed': 'conferenceDisposed',
+
     'avatar-changed': 'avatarChanged',
     'audio-availability-changed': 'audioAvailabilityChanged',
     'audio-mute-status-changed': 'audioMuteStatusChanged',
@@ -559,17 +583,54 @@ export default class JitsiMeetExternalAPI extends EventEmitter {
                 this._myUserID = userID;
                 this._participants[userID] = {
                     email: data.email,
-                    avatarURL: data.avatarURL
+                    local: true,
+                    pinned: false,
+                    audioMuted: true,
+                    videoMuted: true,
+                    audioLevel: 0,
+                    isGuest: data.isGuest,
+                    guestId: data.guestId,
+                    avatarURL: data.avatarURL,
+                    isRecording: data.isRecording
                 };
             }
 
             // eslint-disable-next-line no-fallthrough
             case 'participant-joined': {
-                this._participants[userID] = this._participants[userID] || {};
+                this._participants[userID] = {
+                    audioMuted: true,
+                    videoMuted: true,
+                    audioLevel: 0,
+                    ...this._participants[userID],
+                    ...data,
+                };
                 this._participants[userID].displayName = data.displayName;
                 this._participants[userID].formattedDisplayName
                     = data.formattedDisplayName;
                 changeParticipantNumber(this, 1);
+                break;
+            }
+            case 'participant-audio-level-updated': {
+                const participant = this._participants[userID];
+
+                if (!participant) return;
+                this._participants[userID] = { ...participant, audioLevel: data.value };
+                break;
+            }
+            case 'participant-updated': {
+                switch (data.fieldName) {
+                    case 'pinned':
+                        for(const id in this._participants) {
+                            this._participants[id].pinned = this._participants[id].participantId === userID ? data.value : false;
+                        }
+                        break;
+                    default:
+                        const participant = this._participants[userID];
+
+                        if (!participant) return;
+                        this._participants[userID] = { ...participant, [data.fieldName]: data.value };
+                }
+
                 break;
             }
             case 'participant-left':
@@ -804,6 +865,7 @@ export default class JitsiMeetExternalAPI extends EventEmitter {
      */
     dispose() {
         this.emit('_willDispose');
+        this.emit('conferenceDisposed', this.roomName);
         this._transport.dispose();
         this.removeAllListeners();
         if (this._frame && this._frame.parentNode) {
@@ -830,7 +892,7 @@ export default class JitsiMeetExternalAPI extends EventEmitter {
      */
     executeCommand(name, ...args) {
         if (!(name in commands)) {
-            console.error('Not supported command name.');
+            console.error(`Not supported command name. ${name}`);
 
             return;
         }
@@ -927,7 +989,9 @@ export default class JitsiMeetExternalAPI extends EventEmitter {
             participant.participantId = participantIds[idx];
         });
 
-        return participantsInfo;
+        return participantsInfo.map((participant, idx) => {
+            return { ...participant, participantId: participantIds[idx] };
+        }).filter(participant => participant.participantId !== 'local');
     }
 
     /**

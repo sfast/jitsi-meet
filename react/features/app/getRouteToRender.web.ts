@@ -57,17 +57,10 @@ function _getWebConferenceRoute(state: IReduxState) {
     }
 
     return getDeepLinkingPage(state)
-        .then(deepLinkComponent => {
-            if (deepLinkComponent) {
-                route.component = deepLinkComponent;
-            } else if (isSupportedBrowser()) {
-                route.component = Conference;
-            } else {
-                route.component = UnsupportedDesktopBrowser;
-            }
-
-            return route;
-        });
+    .then(() => {
+        route.component = Conference;
+        return route;
+    });
 }
 
 /**

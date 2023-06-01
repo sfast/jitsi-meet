@@ -46,6 +46,22 @@ function _createOrRemoveVirtualParticipants(
     const removedScreenshareSourceNames = _.difference(oldScreenshareSourceNames, newScreenshareSourceNames);
     const addedScreenshareSourceNames = _.difference(newScreenshareSourceNames, oldScreenshareSourceNames);
 
+    removedScreenshareSourceNames.forEach(name => {
+        const id = name.split('-')[0];
+        APP.API.notifyParticipantUpdated(id, {
+            fieldName: 'isScreenShareing',
+            value: false,
+        });
+    });
+
+    addedScreenshareSourceNames.forEach(name => {
+        const id = name.split('-')[0];
+        APP.API.notifyParticipantUpdated(id, {
+            fieldName: 'isScreenShareing',
+            value: true,
+        });
+    });
+
     if (removedScreenshareSourceNames.length) {
         removedScreenshareSourceNames.forEach(id => dispatch(participantLeft(id, conference, {
             fakeParticipant: FakeParticipant.RemoteScreenShare

@@ -98,6 +98,7 @@ class Watermarks extends Component<IProps, State> {
      * @returns {ReactElement}
      */
     render() {
+        return null;
         return (
             <div>
                 {

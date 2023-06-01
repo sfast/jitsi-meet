@@ -8,6 +8,8 @@ import AbstractUserMediaPermissionsOverlay, { abstractMapStateToProps }
     from './AbstractUserMediaPermissionsOverlay';
 import OverlayFrame from './OverlayFrame';
 
+const dooqodWorkspaceLogo = 'https://dooqod-assets.s3.eu-central-1.amazonaws.com/workspace_logo.png';
+
 /**
  * Implements a React Component for overlay with guidance how to proceed with
  * gUM prompt.
@@ -25,13 +27,17 @@ class UserMediaPermissionsOverlay extends AbstractUserMediaPermissionsOverlay {
             background: _premeetingBackground,
             backgroundPosition: 'center',
             backgroundSize: 'cover'
-        } : {};
+        } : {
+            backgroundColor: 'white'
+        };
 
         return (
             <OverlayFrame style = { style }>
-                <div className = 'inlay'>
+                <div className="inlay__content" style = {{ textAlign: 'center' }}>
+                    <img src = {dooqodWorkspaceLogo} width="120" />
                     <span className = 'inlay__icon icon-microphone' />
                     <span className = 'inlay__icon icon-camera' />
+                    <img src = './images/dooqodAllowPermission.png' width ="300"/>
                     <h3
                         aria-label = { t('startupoverlay.genericTitle') }
                         className = 'inlay__title'

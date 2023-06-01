@@ -48,6 +48,9 @@ import {
 import { getUnreadCount } from './functions';
 import { INCOMING_MSG_SOUND_FILE } from './sounds';
 
+import { closeSideToolBar, openChat, openSideToolBar } from './actions.web';
+import { CLOSE_SIDE_TOOL_BAR, OPEN_SIDE_TOOL_BAR } from './actionTypes';
+
 /**
  * Timeout for when to show the privacy notice after a private message was received.
  *
@@ -66,6 +69,7 @@ MiddlewareRegistry.register(store => next => action => {
     const { dispatch, getState } = store;
     const localParticipant = getLocalParticipant(getState());
     let isOpen, unreadCount;
+    const { sideToolBarIsOpen } = getState()['features/chat'];
 
     switch (action.type) {
     case ADD_MESSAGE:
@@ -101,9 +105,13 @@ MiddlewareRegistry.register(store => next => action => {
         if (typeof APP !== 'undefined') {
             APP.API.notifyChatUpdated(unreadCount, true);
         }
+        !sideToolBarIsOpen && dispatch(openSideToolBar());
+
         break;
 
     case CLOSE_CHAT: {
+        unreadCount = getUnreadCount(getState());
+
         const isPollTabOpen = getState()['features/chat'].isPollsTabFocused;
 
         unreadCount = 0;
@@ -115,6 +123,8 @@ MiddlewareRegistry.register(store => next => action => {
         if (isPollTabOpen) {
             dispatch(resetNbUnreadPollsMessages());
         }
+        sideToolBarIsOpen && dispatch(closeSideToolBar());
+
         break;
     }
 

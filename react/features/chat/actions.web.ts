@@ -2,7 +2,7 @@
 import VideoLayout from '../../../modules/UI/videolayout/VideoLayout';
 import { IStore } from '../app/types';
 
-import { OPEN_CHAT } from './actionTypes';
+import { OPEN_CHAT, CLOSE_SIDE_TOOL_BAR, OPEN_SIDE_TOOL_BAR   } from './actionTypes';
 import { closeChat } from './actions.any';
 
 export * from './actions.any';
@@ -39,6 +39,37 @@ export function toggleChat() {
             dispatch(closeChat());
         } else {
             dispatch(openChat());
+        }
+
+        // Recompute the large video size whenever we toggle the chat, as it takes chat state into account.
+        VideoLayout.onResize();
+    };
+}
+
+export function openSideToolBar() {
+    return function(dispatch: (Object: any) => Object) {
+        dispatch({
+            type: OPEN_SIDE_TOOL_BAR
+        });
+    };
+}
+
+export function closeSideToolBar() {
+    return function(dispatch: (Object: any) => Object) {
+        dispatch({
+            type: CLOSE_SIDE_TOOL_BAR
+        });
+    };
+}
+
+export function toogleSideToolBar() {
+    return (dispatch: any, getState: Function) => {
+        const sideToolBarIsOpen = getState()['features/chat'].sideToolBarIsOpen;
+
+        if (sideToolBarIsOpen) {
+            dispatch(closeSideToolBar());
+        } else {
+            dispatch(openSideToolBar());
         }
 
         // Recompute the large video size whenever we toggle the chat, as it takes chat state into account.

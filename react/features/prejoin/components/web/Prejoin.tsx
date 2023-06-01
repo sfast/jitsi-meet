@@ -34,6 +34,7 @@ import {
 } from '../../functions';
 
 import JoinByPhoneDialog from './dialogs/JoinByPhoneDialog';
+import { CircularProgress } from '@mui/material';
 
 interface IProps {
 
@@ -200,6 +201,7 @@ const Prejoin = ({
 }: IProps) => {
     const showDisplayNameField = useRef(canEditDisplayName || showErrorOnJoin);
     const [ showJoinByPhoneButtons, setShowJoinByPhoneButtons ] = useState(false);
+    const [ loadingState, setLoadingState ] = useState(false);
     const { classes } = useStyles();
     const { t } = useTranslation();
 
@@ -213,9 +215,15 @@ const Prejoin = ({
         if (showErrorOnJoin) {
             return;
         }
-        joinConference();
+
+        setLoadingState(true);
+        APP.API.notifyJoinMeetingButtonClicked(name);
     };
 
+    const _onCancelButtonClick = () => {
+        setLoadingState(false)
+        APP.API.notifyJoinMeetingButtonCanceled(name);
+    }
     /**
      * Closes the dropdown.
      *
@@ -336,7 +344,7 @@ const Prejoin = ({
      */
     const onInputKeyPress = (e: React.KeyboardEvent) => {
         if (e.key === 'Enter') {
-            joinConference();
+            onJoinButtonClick();
         }
     };
 
@@ -353,9 +361,10 @@ const Prejoin = ({
     return (
         <PreMeetingScreen
             showDeviceStatus = { deviceStatusVisible }
-            title = { t('prejoin.joinMeeting') }
+            title = { t(loadingState ? 'prejoin.waitingForAccept' : 'prejoin.joinMeeting') }
             videoMuted = { !showCameraPreview }
             videoTrack = { videoTrack }>
+            {loadingState && <CircularProgress sx={{ alignSelf: 'center', mb: 3 }} />}
             <div
                 className = { classes.inputContainer }
                 data-testid = 'prejoin.screen'>
@@ -367,7 +376,7 @@ const Prejoin = ({
                     onChange = { setName }
                     onKeyPress = { onInputKeyPress }
                     placeholder = { t('dialog.enterDisplayName') }
-                    readOnly = { readOnlyName }
+                    readOnly = { loadingState }
                     value = { name } />
                 ) : (
                     <div className = { classes.avatarContainer }>
@@ -385,7 +394,7 @@ const Prejoin = ({
                     data-testid = 'prejoin.errorMessage'>{t('prejoin.errorMissingName')}</div>}
 
                 <div className = { classes.dropdownContainer }>
-                    <Popover
+                    {!loadingState ? <Popover
                         content = { hasExtraJoinButtons && <div className = { classes.dropdownButtons }>
                             {extraButtonsToRender.map(({ key, ...rest }) => (
                                 <Button
@@ -405,17 +414,28 @@ const Prejoin = ({
                             ariaDropDownLabel = { t('prejoin.joinWithoutAudio') }
                             ariaLabel = { t('prejoin.joinMeeting') }
                             ariaPressed = { showJoinByPhoneButtons }
-                            disabled = { joiningInProgress }
+                            disabled = { loadingState }
                             hasOptions = { hasExtraJoinButtons }
                             onClick = { onJoinButtonClick }
                             onOptionsClick = { onOptionsClick }
+                            onKeyPress = { onInputKeyPress }
                             role = 'button'
                             tabIndex = { 0 }
                             testId = 'prejoin.joinMeeting'
                             type = 'primary'>
                             {t('prejoin.joinMeeting')}
                         </ActionButton>
-                    </Popover>
+                    </Popover> : (
+                        <>
+                            <ActionButton
+                                ariaLabel = { t('dialog.Cancel') }
+                                onClick = { _onCancelButtonClick }
+                                role = 'button'
+                                type = 'primary'>
+                                { t('dialog.Cancel') }
+                            </ActionButton>
+                        </>
+                    )}
                 </div>
             </div>
             {showDialog && (

@@ -37,6 +37,7 @@ import {
     isUserInteractionRequiredForUnmute,
     setTrackMuted
 } from './functions';
+import { getLocalParticipant  } from '../participants/functions';
 import './subscriber';
 
 /**
@@ -50,6 +51,16 @@ import './subscriber';
 MiddlewareRegistry.register(store => next => action => {
     switch (action.type) {
     case SET_AUDIO_MUTED:
+        APP.API.notifyParticipantUpdated(getLocalParticipant(store.getState())?.id, {
+            fieldName: 'audioMuted',
+            value: !!action.muted,
+        });
+
+        action.muted && APP.API.notifyParticipantUpdated(getLocalParticipant(store.getState())?.id, {
+            fieldName: 'audioLevel',
+            value: 0,
+        });
+
         if (!action.muted
                 && isUserInteractionRequiredForUnmute(store.getState())) {
             return;
@@ -83,6 +94,11 @@ MiddlewareRegistry.register(store => next => action => {
         break;
 
     case SET_VIDEO_MUTED:
+        APP.API.notifyParticipantUpdated(getLocalParticipant(store.getState())?.id, {
+            fieldName: 'videoMuted',
+            value: !!action.muted,
+        });
+
         if (!action.muted
                 && isUserInteractionRequiredForUnmute(store.getState())) {
             return;

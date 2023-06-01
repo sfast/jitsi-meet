@@ -246,6 +246,7 @@ const LocalRecordingManager: ILocalRecordingManager = {
                 video: { displaySurface: 'browser',
                     frameRate: 30 },
                 audio: false,
+                // @ts-ignore
                 preferCurrentTab: true
             });
             document.title = currentTitle;
