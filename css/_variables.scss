@@ -79,7 +79,7 @@ $chatLobbyActionsSeparatorColor: #6A50D3;
 $chatLocalMessageBackgroundColor: #484A4F;
 $chatPrivateMessageBackgroundColor: rgb(153, 69, 77);
 $chatRemoteMessageBackgroundColor:  #242528;
-$sidebarWidth: 315px;
+$sidebarWidth: 330px;
 
 /**
  * Misc.
@@ -241,3 +241,10 @@ $verySmallScreen: 500px;
 */
 
 $prejoinDefaultContentWidth: 336px;
+
+$muiPrimary: #2196f3;
+$muiPrimaryHover: #1e88e5;
+$muiDisabledBg: #E0E0E0;
+$muiDisabled: rgba(0, 0, 0, 0.12);
+$muiDisabledText: rgba(0, 0, 0, 0.26);
+$muiTextFileldLabelColor: rgba(0, 0, 0, 0.54);

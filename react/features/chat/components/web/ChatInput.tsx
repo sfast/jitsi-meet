@@ -131,7 +131,9 @@ class ChatInput extends Component<IProps, IState> {
                         disabled = { !this.state.message.trim() }
                         icon = { IconSend }
                         onClick = { this._onSubmitMessage }
-                        size = { isMobileBrowser() ? 'large' : 'medium' } />
+                        size = { isMobileBrowser() ? 'large' : 'medium' } 
+                        className={'rotate-30'}
+                    />
                 </div>
             </div>
         );

@@ -110,8 +110,6 @@ MiddlewareRegistry.register(store => next => action => {
         break;
 
     case CLOSE_CHAT: {
-        unreadCount = getUnreadCount(getState());
-
         const isPollTabOpen = getState()['features/chat'].isPollsTabFocused;
 
         unreadCount = 0;
