@@ -31,6 +31,7 @@ import {
 import {
     ASPECT_RATIO_BREAKPOINT,
     DEFAULT_FILMSTRIP_WIDTH,
+    MIN_FILMSTRIP_WIDTH,
     FILMSTRIP_TYPE,
     MIN_STAGE_VIEW_HEIGHT,
     MIN_STAGE_VIEW_WIDTH,
@@ -528,7 +529,7 @@ class Filmstrip extends PureComponent <IProps, IState> {
                 const diff = (mousePosition ?? 0) - e.clientX;
                 const width = Math.max(
                     Math.min((dragFilmstripWidth ?? 0) + diff, _maxFilmstripWidth),
-                    DEFAULT_FILMSTRIP_WIDTH
+                    MIN_FILMSTRIP_WIDTH
                 );
 
                 if (width !== _verticalFilmstripWidth) {

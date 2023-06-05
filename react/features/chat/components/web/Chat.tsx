@@ -143,7 +143,7 @@ class Chat extends AbstractChat<IProps> {
                         role = 'tabpanel'
                         tabIndex = { 0 }>
                         <div className = 'sideToolbarHeaderCont'>
-                            <Typography>
+                            <Typography sx={{ fontSize: 14 }}>
                                 {t('chat.title')}
                             </Typography>
                             <IconButton onClick={() => this._onToggleChat()} className='sideToolbarCloseBtn'>

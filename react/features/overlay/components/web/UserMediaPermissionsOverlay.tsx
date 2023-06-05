@@ -33,8 +33,8 @@ class UserMediaPermissionsOverlay extends AbstractUserMediaPermissionsOverlay {
 
         return (
             <OverlayFrame style = { style }>
-                <div className="inlay__content" style = {{ textAlign: 'center' }}>
-                    <img src = {dooqodWorkspaceLogo} width="120" />
+                <div className="inlay__content" style={{ textAlign: 'center', marginTop: '14%', display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
+                    <img src = {dooqodWorkspaceLogo} width="120" style={{ marginBottom: 10 }} />
                     <span className = 'inlay__icon icon-microphone' />
                     <span className = 'inlay__icon icon-camera' />
                     <img src = './images/dooqodAllowPermission.png' width ="300"/>
