@@ -38,8 +38,7 @@ import {
     getLocalTrack,
     getLocalTracks,
     getLocalVideoTrack,
-    getTrackByJitsiTrack,
-    isToggleCameraEnabled
+    getTrackByJitsiTrack
 } from './functions';
 import logger from './logger';
 import { ITrackOptions } from './types';
@@ -866,37 +865,3 @@ export function toggleCamera() {
     };
 }
 
-/**
- * Sets the camera facing mode(environment/user). If facing mode not provided, it will do a toggle.
- *
- * @param {string | undefined} facingMode - The selected facing mode.
- * @returns {void}
- */
-export function setCameraFacingMode(facingMode: string | undefined) {
-    return async (dispatch: IStore['dispatch'], getState: IStore['getState']) => {
-        const state = getState();
-
-        if (!isToggleCameraEnabled(state)) {
-            return;
-        }
-
-        if (!facingMode) {
-            dispatch(toggleCamera());
-
-            return;
-        }
-
-        const tracks = state['features/base/tracks'];
-        const localVideoTrack = getLocalVideoTrack(tracks)?.jitsiTrack;
-
-        if (!tracks || !localVideoTrack) {
-            return;
-        }
-
-        const currentFacingMode = localVideoTrack.getCameraFacingMode();
-
-        if (currentFacingMode !== facingMode) {
-            dispatch(toggleCamera());
-        }
-    };
-}

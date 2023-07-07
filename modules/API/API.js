@@ -50,7 +50,7 @@ import {
 } from '../../react/features/base/participants/functions';
 import { updateSettings } from '../../react/features/base/settings/actions';
 import { getDisplayName } from '../../react/features/base/settings/functions.web';
-import { setCameraFacingMode } from '../../react/features/base/tracks/actions.any';
+import { setCameraFacingMode } from '../../react/features/base/tracks/actions.web';
 import {
     autoAssignToBreakoutRooms,
     closeBreakoutRoom,

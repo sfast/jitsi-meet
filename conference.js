@@ -130,7 +130,7 @@ import {
     trackAdded,
     trackRemoved
 } from './react/features/base/tracks/actions';
-import { setCameraFacingMode } from './react/features/base/tracks/actions.any';
+import { setCameraFacingMode } from './react/features/base/tracks/actions.web';
 import {
     createLocalTracksF,
     getLocalJitsiAudioTrack,
