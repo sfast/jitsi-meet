@@ -3,9 +3,10 @@
 import { jitsiLocalStorage } from '@jitsi/js-utils';
 import Logger from '@jitsi/logger';
 import EventEmitter from 'events';
+import { v4 as uuidv4 } from 'uuid';
 
 import { openConnection } from './connection';
-import { ENDPOINT_TEXT_MESSAGE_NAME } from './modules/API/constants';
+import { CAMERA_FACING_MODE_MESSAGE, ENDPOINT_TEXT_MESSAGE_NAME } from './modules/API/constants';
 import { AUDIO_ONLY_SCREEN_SHARE_NO_TRACK } from './modules/UI/UIErrors';
 import AuthHandler from './modules/UI/authentication/AuthHandler';
 import UIUtil from './modules/UI/util/UIUtil';
@@ -95,7 +96,7 @@ import {
     setVideoMuted,
     setVideoUnmutePermissions
 } from './react/features/base/media/actions';
-import { MEDIA_TYPE } from './react/features/base/media/constants';
+import { CAPTURE_SCREENSHOT_MESSAGE, MEDIA_TYPE, SEND_SCREENSHOT_MESSAGE } from './react/features/base/media/constants';
 import {
     getStartWithAudioMuted,
     getStartWithVideoMuted,
@@ -129,6 +130,7 @@ import {
     trackAdded,
     trackRemoved
 } from './react/features/base/tracks/actions';
+import { setCameraFacingMode } from './react/features/base/tracks/actions.any';
 import {
     createLocalTracksF,
     getLocalJitsiAudioTrack,
@@ -143,6 +145,7 @@ import { showDesktopPicker } from './react/features/desktop-picker/actions';
 import { appendSuffix } from './react/features/display-name/functions';
 import { maybeOpenFeedbackDialog, submitFeedback } from './react/features/feedback/actions';
 import { initKeyboardShortcuts } from './react/features/keyboard-shortcuts/actions';
+import { captureLargeVideoScreenshot } from './react/features/large-video/actions.web';
 import { maybeSetLobbyChatMessageListener } from './react/features/lobby/actions.any';
 import { setNoiseSuppressionEnabled } from './react/features/noise-suppression/actions';
 import { hideNotification, showNotification, showWarningNotification } from './react/features/notifications/actions';
@@ -171,6 +174,13 @@ import UIEvents from './service/UI/UIEvents';
 const logger = Logger.getLogger(__filename);
 
 const eventEmitter = new EventEmitter();
+
+const receivedScreencaptureMap = new Map();
+
+/**
+ * The image chunk size in Bytes <=> 60 KB
+ */
+const IMAGE_CHUNK_SIZE = 1024 * 60;
 
 let room;
 let connection;
@@ -2023,6 +2033,77 @@ export default {
                             },
                             eventData
                         });
+                    }
+
+                    if (eventData.name === CAPTURE_SCREENSHOT_MESSAGE) {
+                        APP.store.dispatch(captureLargeVideoScreenshot()).then(dataURL => {
+                            if (!dataURL) {
+                                room.sendEndpointMessage(sender._id, {
+                                    name: SEND_SCREENSHOT_MESSAGE,
+                                    id: undefined
+                                });
+
+                                return;
+                            }
+
+                            const splitImage = {
+                                uuId: uuidv4(),
+                                chunks: []
+                            };
+                            let currentIndex = 0;
+
+                            while (currentIndex < dataURL.length) {
+                                const newIndex = currentIndex + IMAGE_CHUNK_SIZE;
+
+                                splitImage.chunks.push(dataURL.slice(currentIndex, newIndex));
+                                currentIndex = newIndex;
+                            }
+
+                            const size = splitImage.chunks.length;
+
+                            for (const [ idx, chunk ] of splitImage.chunks.entries()) {
+                                room.sendEndpointMessage(sender._id, {
+                                    name: SEND_SCREENSHOT_MESSAGE,
+                                    id: splitImage.uuId,
+                                    size,
+                                    idx,
+                                    chunk
+                                });
+                            }
+                        });
+                    }
+
+                    if (eventData.name === SEND_SCREENSHOT_MESSAGE) {
+                        if (eventData.id) {
+                            if (!receivedScreencaptureMap.has(eventData.id)) {
+                                receivedScreencaptureMap.set(eventData.id, new Array(eventData.size));
+                            }
+
+                            const arr = receivedScreencaptureMap.get(eventData.id);
+                            const { id, idx, chunk, size } = eventData;
+
+                            arr[idx] = chunk;
+                            if (idx === size - 1) {
+                                const dataURL = arr.join('');
+
+                                APP.API.notifyLargeVideoScreenshotReceived({
+                                    jid: sender._jid,
+                                    id: sender._id
+                                },
+                                dataURL);
+                                receivedScreencaptureMap.delete(id);
+                            }
+                        } else {
+                            APP.API.notifyLargeVideoScreenshotReceived({
+                                jid: sender._jid,
+                                id: sender._id
+                            },
+                            undefined);
+                        }
+                    }
+
+                    if (eventData.name === CAMERA_FACING_MODE_MESSAGE) {
+                        APP.store.dispatch(setCameraFacingMode(eventData.facingMode));
                     }
                 }
             });

@@ -22,3 +22,8 @@ export const ENDPOINT_TEXT_MESSAGE_NAME = 'endpoint-text-message';
  * but rather allowing the estimations to take place.
  */
 export const MIN_ASSUMED_BANDWIDTH_BPS = -1;
+
+/**
+ * The payload name for remotely setting the camera facing mode message.
+ */
+export const CAMERA_FACING_MODE_MESSAGE = 'camera-facing-mode-message';

@@ -64,3 +64,13 @@ export const VIDEO_TYPE: { [key: string]: VideoType; } = {
 };
 
 export type VideoType = 'camera' | 'desktop';
+
+/**
+ * The payload name for the capture screenshot remotely message.
+ */
+export const CAPTURE_SCREENSHOT_MESSAGE = 'capture-screenshot-message';
+
+/**
+ * The payload name for the received screenshot message.
+ */
+export const SEND_SCREENSHOT_MESSAGE = 'send-screenshot-message';
