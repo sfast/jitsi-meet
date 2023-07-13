@@ -1202,7 +1202,7 @@ class Thumbnail extends Component<IProps, IState> {
                     containerClassName = { this._getContainerClassName() }
                     isHovered = { isHovered }
                     isLocal = { isLocalScreenshareParticipant(_participant) }
-                    isMobile = { _isMobile }
+                    isMobile = { false }
                     onClick = { this._onClick }
                     onMouseEnter = { this._onMouseEnter }
                     onMouseLeave = { this._onMouseLeave }
