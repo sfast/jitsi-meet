@@ -329,6 +329,7 @@ class LargeVideo extends Component<IProps> {
         e.stopPropagation();
         e.preventDefault();
 
+        return;
         if (this._tappedTimeout) {
             this._clearTapTimeout();
             this.props.dispatch(setTileView(true));

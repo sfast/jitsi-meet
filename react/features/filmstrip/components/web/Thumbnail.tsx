@@ -880,7 +880,8 @@ class Thumbnail extends Component<IProps, IState> {
      * @returns {ReactElement}
      */
     _renderFakeParticipant() {
-        const { _isMobile, _participant: { avatarURL, pinned, name } } = this.props;
+        const { _participant: { avatarURL, pinned, name } } = this.props;
+        const _isMobile = false;
         const styles = this._getStyles();
         const containerClassName = this._getContainerClassName();
 
@@ -1024,7 +1025,6 @@ class Thumbnail extends Component<IProps, IState> {
             _audioTrack,
             _disableLocalVideoFlip,
             _gifSrc,
-            _isMobile,
             _isMobilePortrait,
             _isScreenSharing,
             _localFlipX,
@@ -1036,6 +1036,7 @@ class Thumbnail extends Component<IProps, IState> {
             filmstripType,
             t
         } = this.props;
+        const _isMobile = false;
         const { id, name, pinned } = _participant || {};
         const { isHovered, popoverVisible } = this.state;
         const styles = this._getStyles();
@@ -1194,7 +1195,8 @@ class Thumbnail extends Component<IProps, IState> {
 
         if (_isVirtualScreenshareParticipant) {
             const { isHovered } = this.state;
-            const { _videoTrack, _isMobile, classes, _thumbnailType } = this.props;
+            const { _videoTrack, classes, _thumbnailType } = this.props;
+            const _isMobile = false;
 
             return (
                 <VirtualScreenshareParticipant
@@ -1202,7 +1204,7 @@ class Thumbnail extends Component<IProps, IState> {
                     containerClassName = { this._getContainerClassName() }
                     isHovered = { isHovered }
                     isLocal = { isLocalScreenshareParticipant(_participant) }
-                    isMobile = { false }
+                    isMobile = { _isMobile }
                     onClick = { this._onClick }
                     onMouseEnter = { this._onMouseEnter }
                     onMouseLeave = { this._onMouseLeave }
@@ -1253,7 +1255,7 @@ function _mapStateToProps(state: IReduxState, ownProps: any): Object {
         iAmSipGateway
     } = state['features/base/config'];
     const { localFlipX } = state['features/base/settings'];
-    const _isMobile = isMobileBrowser();
+    const _isMobile = false;
     const activeParticipants = getActiveParticipantsIds(state);
     const tileType = getThumbnailTypeFromLayout(_currentLayout, filmstripType);
 
