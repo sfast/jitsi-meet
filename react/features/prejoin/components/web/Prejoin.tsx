@@ -456,7 +456,7 @@ const Prejoin = ({
  */
 function mapStateToProps(state: IReduxState) {
     const name = getDisplayName(state);
-    const showErrorOnJoin = isDisplayNameRequired(state) && !name;
+    const showErrorOnJoin = isDisplayNameRequired(state) && !name.trim();
     const { id: participantId } = getLocalParticipant(state) ?? {};
     const { joiningInProgress } = state['features/prejoin'];
 
