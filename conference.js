@@ -1913,6 +1913,7 @@ export default {
         room.on(JitsiConferenceEvents.TRACK_MUTE_CHANGED, (track, participantThatMutedUs) => {
             if (participantThatMutedUs) {
                 APP.store.dispatch(participantMutedUs(participantThatMutedUs, track));
+                APP.API.notifyParticipantUpdated('', { fieldName: 'muted_by_admin' });
                 if (this.isSharingScreen && track.isVideoTrack()) {
                     logger.debug('TRACK_MUTE_CHANGED while screen sharing');
                     this._turnScreenSharingOff(false);

@@ -624,6 +624,10 @@ export default class JitsiMeetExternalAPI extends EventEmitter {
                             this._participants[id].pinned = this._participants[id].participantId === userID ? data.value : false;
                         }
                         break;
+                    case 'muted_by_admin':
+                        const _participant = Object.values(this._participants).find(user => user.local);
+                        this._participants[_participant.participantId] = { ..._participant, audioMuted: true };
+                        break;
                     default:
                         const participant = this._participants[userID];
 
