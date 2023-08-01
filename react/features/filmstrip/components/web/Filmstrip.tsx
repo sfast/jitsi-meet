@@ -375,7 +375,7 @@ class Filmstrip extends PureComponent <IProps, IState> {
             || (_currentLayout === LAYOUTS.STAGE_FILMSTRIP_VIEW && filmstripType === FILMSTRIP_TYPE.MAIN)) {
             filmstripStyle.maxWidth = _verticalViewMaxWidth;
             if (!_mainFilmstripVisible) {
-                filmstripStyle.right = `-${filmstripStyle.maxWidth}px`;
+                // filmstripStyle.right = `-${filmstripStyle.maxWidth}px`;
             }
         }
 
