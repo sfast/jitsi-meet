@@ -165,6 +165,8 @@ import { muteLocal } from './react/features/video-menu/actions.any';
 import { setIAmVisitor } from './react/features/visitors/actions';
 import { iAmVisitor } from './react/features/visitors/functions';
 import UIEvents from './service/UI/UIEvents';
+import { SETTINGS_TABS } from './react/features/settings/constants';
+import { openSettingsDialog } from './react/features/settings/actions.web';
 
 const logger = Logger.getLogger(__filename);
 
@@ -2845,6 +2847,10 @@ export default {
      */
     setVideoMuteStatus() {
         APP.UI.setVideoMuted(this.getMyUserId());
+    },
+
+    openSettings() {
+        APP.store.dispatch(openSettingsDialog(SETTINGS_TABS.VIRTUAL_BACKGROUND));
     },
 
     setUserIsGuest(isGuest) {

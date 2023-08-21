@@ -534,6 +534,9 @@ function initCommands() {
             sendAnalytics(createApiEvent('avatar.url.changed'));
             APP.conference.changeLocalAvatarUrl(avatarUrl);
         },
+        'open-settings': () => {
+            APP.conference.openSettings();
+        },
         'is-guest': isGuest => {
             APP.conference.setUserIsGuest(isGuest === 'true');
         },
@@ -1211,6 +1214,13 @@ class API {
             name: 'participant-audio-level-updated',
             id,
             value,
+        });
+    }
+
+
+    notifyCloseSettings(){
+        this._sendEvent({
+            name: 'close-settings',
         });
     }
 

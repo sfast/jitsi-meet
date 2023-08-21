@@ -41,6 +41,7 @@ const commands = {
     muteParticipant: 'mute-participant',
     startScreenShare: 'start-screen-share',
     stopScreenShare: 'stop-screen-share',
+    openSettings: 'open-settings',
 
     addBreakoutRoom: 'add-breakout-room',
     answerKnockingParticipant: 'answer-knocking-participant',
@@ -118,6 +119,7 @@ const events = {
 
     'participant-updated': 'participantUpdated',
     'participant-audio-level-updated': 'participantAudioLevelUpdated',
+    'close-settings': 'closeSettings',
 
     'toolbar-button-clicked': 'toolbarButtonClicked',
     'conference-disposed': 'conferenceDisposed',

@@ -317,7 +317,7 @@ function _mapStateToProps(state: IReduxState, ownProps: any) {
         });
     }
 
-    return { _tabs: tabs };
+    return { _tabs: [ tabs[2] ] };
 }
 
 export default connect(_mapStateToProps)(SettingsDialog);
