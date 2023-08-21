@@ -221,6 +221,7 @@ const DialogWithTabs = ({
                 cancel && dispatch(cancel());
             });
         }
+        APP.API.notifyCloseSettings();
         dispatch(hideDialog());
     }, []);
 
