@@ -818,6 +818,7 @@
     },
     "poweredby": "powered by",
     "prejoin": {
+        "waitingForAccept": "Waiting for Project Members to accept your request to join a meet",
         "audioAndVideoError": "Audio and video error:",
         "audioDeviceProblem": "There is a problem with your audio device",
         "audioOnlyError": "Audio error:",

@@ -52,13 +52,6 @@ function ChatHeader({ className, isPollsEnabled }: IProps) {
                 role = 'heading'>
                 { t(isPollsEnabled ? 'chat.titleWithPolls' : 'chat.title') }
             </span>
-            <Icon
-                ariaLabel = { t('toolbar.closeChat') }
-                onClick = { onCancel }
-                onKeyPress = { onKeyPressHandler }
-                role = 'button'
-                src = { IconCloseLarge }
-                tabIndex = { 0 } />
         </div>
     );
 }

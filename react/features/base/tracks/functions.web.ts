@@ -103,10 +103,10 @@ export function createLocalTracksF(options: ITrackOptions = {}, store?: IStore) 
  */
 export function createPrejoinTracks() {
     const errors: any = {};
-    const initialDevices = [ 'audio' ];
+    const initialDevices = [ 'audio', 'video' ];
     const requestedAudio = true;
-    let requestedVideo = false;
-    const { startAudioOnly, startWithAudioMuted, startWithVideoMuted } = APP.store.getState()['features/base/settings'];
+    const requestedVideo = true;
+    const { startWithAudioMuted } = APP.store.getState()['features/base/settings'];
 
     // Always get a handle on the audio input device so that we have statistics even if the user joins the
     // conference muted. Previous implementation would only acquire the handle when the user first unmuted,
@@ -114,11 +114,6 @@ export function createPrejoinTracks() {
     // only after that point.
     if (startWithAudioMuted) {
         APP.store.dispatch(setAudioMuted(true));
-    }
-
-    if (!startWithVideoMuted && !startAudioOnly) {
-        initialDevices.push('video');
-        requestedVideo = true;
     }
 
     let tryCreateLocalTracks;

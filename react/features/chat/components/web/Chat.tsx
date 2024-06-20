@@ -1,11 +1,12 @@
 import clsx from 'clsx';
 import React from 'react';
 import { connect } from 'react-redux';
+import { IconButton, Slide, Typography } from '@mui/material';
 
 import { translate } from '../../../base/i18n/functions';
 import Tabs from '../../../base/ui/components/web/Tabs';
 import PollsPane from '../../../polls/components/web/PollsPane';
-import { toggleChat } from '../../actions.web';
+import { toggleChat, toogleSideToolBar } from '../../actions.web';
 import { CHAT_TABS } from '../../constants';
 import AbstractChat, {
     IProps,
@@ -19,6 +20,16 @@ import KeyboardAvoider from './KeyboardAvoider';
 import MessageContainer from './MessageContainer';
 import MessageRecipient from './MessageRecipient';
 
+
+
+function CloseIcon(props: any) {
+    return (
+      <svg xmlns="http://www.w3.org/2000/svg" width={props.width || "16"} height={props.height || "16"} viewBox="0 0 24 24">
+        <path fill={props.fill || "currentColor"} d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/>
+      </svg>
+    );
+  }
+
 /**
  * React Component for holding the chat feature in a side panel that slides in
  * and out of view.
@@ -30,7 +41,6 @@ class Chat extends AbstractChat<IProps> {
      * scrolling to the end of the chat messages.
      */
     _messageContainerRef: Object;
-
     /**
      * Initializes a new {@code Chat} instance.
      *
@@ -57,22 +67,7 @@ class Chat extends AbstractChat<IProps> {
      * @returns {ReactElement}
      */
     render() {
-        const { _isOpen, _isPollsEnabled, _showNamePrompt } = this.props;
-
-        return (
-            _isOpen ? <div
-                className = 'sideToolbarContainer'
-                id = 'sideToolbarContainer'
-                onKeyDown = { this._onEscClick } >
-                <ChatHeader
-                    className = 'chat-header'
-                    isPollsEnabled = { _isPollsEnabled }
-                    onCancel = { this._onToggleChat } />
-                { _showNamePrompt
-                    ? <DisplayNameForm isPollsEnabled = { _isPollsEnabled } />
-                    : this._renderChat() }
-            </div> : null
-        );
+        return this._renderChat();
     }
 
     /**
@@ -125,27 +120,43 @@ class Chat extends AbstractChat<IProps> {
      * @returns {ReactElement}
      */
     _renderChat() {
-        const { _isPollsEnabled, _isPollsTabFocused } = this.props;
+        const { _isPollsEnabled, _isPollsTabFocused, t, _isOpen } = this.props;
 
         return (
             <>
                 { _isPollsEnabled && this._renderTabs() }
-                <div
-                    aria-labelledby = { CHAT_TABS.CHAT }
-                    className = { clsx(
-                        'chat-panel',
-                        !_isPollsEnabled && 'chat-panel-no-tabs',
-                        _isPollsTabFocused && 'hide'
-                    ) }
-                    id = { `${CHAT_TABS.CHAT}-panel` }
-                    role = 'tabpanel'
-                    tabIndex = { 0 }>
-                    <MessageContainer
-                        messages = { this.props._messages } />
-                    <MessageRecipient />
-                    <ChatInput
-                        onSend = { this._onSendMessage } />
-                </div>
+                <Slide
+                    direction="left"
+                    in={_isOpen}
+                    mountOnEnter
+                    unmountOnExit
+                    timeout={400}
+                >
+                    <div
+                        aria-labelledby = { CHAT_TABS.CHAT }
+                        className = { clsx(
+                            'chat-panel',
+                            !_isPollsEnabled && 'chat-panel-no-tabs',
+                            _isPollsTabFocused && 'hide'
+                        ) }
+                        id = { `${CHAT_TABS.CHAT}-panel` }
+                        role = 'tabpanel'
+                        tabIndex = { 0 }>
+                        <div className = 'sideToolbarHeaderCont'>
+                            <Typography sx={{ fontSize: 14 }}>
+                                {t('chat.title')}
+                            </Typography>
+                            <IconButton onClick={() => this._onToggleChat()} className='sideToolbarCloseBtn'>
+                                <CloseIcon />
+                            </IconButton>
+                        </div>
+                        <MessageContainer
+                            messages = { this.props._messages } />
+                        <MessageRecipient />
+                        <ChatInput
+                            onSend = { this._onSendMessage } />
+                    </div>
+                </Slide>
                 { _isPollsEnabled && (
                     <>
                         <div

@@ -109,11 +109,23 @@ MiddlewareRegistry.register(store => next => action => {
                 APP.conference.setVideoMuteStatus();
             } else if (!jitsiTrack.isLocal()) {
                 APP.UI.setVideoMuted(participantID);
+                APP.API.notifyParticipantUpdated(participantID, {
+                    fieldName: 'videoMuted',
+                    value: !!muted,
+                });
             }
         } else if (jitsiTrack.isLocal()) {
             APP.conference.setAudioMuteStatus(muted);
         } else {
             APP.UI.setAudioMuted(participantID, muted);
+            APP.API.notifyParticipantUpdated(participantID, {
+                fieldName: 'audioMuted',
+                value: !!muted,
+            });
+            muted && APP.API.notifyParticipantUpdated(participantID, {
+                fieldName: 'audioLevel',
+                value: 0,
+            });
         }
 
         return result;

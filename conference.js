@@ -165,6 +165,8 @@ import { muteLocal } from './react/features/video-menu/actions.any';
 import { setIAmVisitor } from './react/features/visitors/actions';
 import { iAmVisitor } from './react/features/visitors/functions';
 import UIEvents from './service/UI/UIEvents';
+import { SETTINGS_TABS } from './react/features/settings/constants';
+import { openSettingsDialog } from './react/features/settings/actions.web';
 
 const logger = Logger.getLogger(__filename);
 
@@ -205,6 +207,9 @@ window.JitsiMeetScreenObtainer = {
  * Known custom conference commands.
  */
 const commands = {
+    IS_GUEST: 'is-guest',
+    IS_RECORDING: 'is-recording',
+    GUEST_ID: 'guest-id',
     AVATAR_URL: AVATAR_URL_COMMAND,
     CUSTOM_ROLE: 'custom-role',
     EMAIL: EMAIL_COMMAND,
@@ -1910,6 +1915,7 @@ export default {
         room.on(JitsiConferenceEvents.TRACK_MUTE_CHANGED, (track, participantThatMutedUs) => {
             if (participantThatMutedUs) {
                 APP.store.dispatch(participantMutedUs(participantThatMutedUs, track));
+                APP.API.notifyParticipantUpdated('', { fieldName: 'muted_by_admin' });
                 if (this.isSharingScreen && track.isVideoTrack()) {
                     logger.debug('TRACK_MUTE_CHANGED while screen sharing');
                     this._turnScreenSharingOff(false);
@@ -2069,6 +2075,37 @@ export default {
         APP.UI.addListener(UIEvents.VIDEO_MUTED, (muted, showUI = false) => {
             this.muteVideo(muted, showUI);
         });
+
+        room.addCommandListener(
+            this.commands.defaults.IS_GUEST,
+            (data, from) => {
+                APP.store.dispatch(
+                    participantUpdated({
+                        conference: room,
+                        id: from,
+                        isGuest: data.value === 'true'
+                    }));
+            });
+        room.addCommandListener(
+            this.commands.defaults.IS_RECORDING,
+            (data, from) => {
+                APP.store.dispatch(
+                    participantUpdated({
+                        conference: room,
+                        id: from,
+                        isRecording: data.value === 'true'
+                    }));
+            });
+        room.addCommandListener(
+            this.commands.defaults.GUEST_ID,
+            (data, from) => {
+                APP.store.dispatch(
+                    participantUpdated({
+                        conference: room,
+                        id: from,
+                        guestId: data.value
+                    }));
+            });
 
         room.addCommandListener(this.commands.defaults.ETHERPAD,
             ({ value }) => {
@@ -2810,6 +2847,46 @@ export default {
      */
     setVideoMuteStatus() {
         APP.UI.setVideoMuted(this.getMyUserId());
+    },
+
+    openSettings() {
+        APP.store.dispatch(openSettingsDialog(SETTINGS_TABS.VIRTUAL_BACKGROUND));
+    },
+
+    setUserIsGuest(isGuest) {
+        const { id } = getLocalParticipant(APP.store.getState());
+
+        APP.store.dispatch(participantUpdated({
+            id,
+            local: true,
+            isGuest
+        }));
+
+        sendData(commands.IS_GUEST, isGuest);
+    },
+
+    setUserIsRecording(isRecording) {
+        const { id } = getLocalParticipant(APP.store.getState());
+
+        APP.store.dispatch(participantUpdated({
+            id,
+            local: true,
+            isRecording
+        }));
+
+        sendData(commands.IS_RECORDING, isRecording);
+    },
+
+    setGuestId(guestId) {
+        const { id } = getLocalParticipant(APP.store.getState());
+
+        APP.store.dispatch(participantUpdated({
+            id,
+            local: true,
+            guestId
+        }));
+
+        sendData(commands.GUEST_ID, guestId);
     },
 
     /**

@@ -97,6 +97,9 @@ function _updateLocalParticipantFromUrl({ dispatch, getState }: IStore) {
         return;
     }
 
+    const isGuest = urlParams['userInfo.isGuest'];
+    const isRecording = urlParams['userInfo.isRecording'];
+    const guestId = urlParams['userInfo.guestId'];
     const localParticipant = getLocalParticipant(getState());
 
     if (localParticipant) {
@@ -106,6 +109,9 @@ function _updateLocalParticipantFromUrl({ dispatch, getState }: IStore) {
         dispatch(participantUpdated({
             ...localParticipant,
             email,
+            isGuest,
+            guestId,
+            isRecording,
             name: displayName
         }));
 

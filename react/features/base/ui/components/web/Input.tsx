@@ -70,7 +70,6 @@ const useStyles = makeStyles()(theme => {
 
             '&:focus': {
                 outline: 0,
-                boxShadow: `0px 0px 0px 2px ${theme.palette.focus01}`
             },
 
             '&:disabled': {
@@ -181,7 +180,7 @@ const Input = React.forwardRef<any, IProps>(({
                     size = { 20 }
                     src = { icon } />}
                 {textarea ? (
-                    <TextareaAutosize
+                    <textarea
                         aria-label = { accessibilityLabel }
                         autoComplete = { autoComplete }
                         autoFocus = { autoFocus }
@@ -190,8 +189,6 @@ const Input = React.forwardRef<any, IProps>(({
                         disabled = { disabled }
                         { ...(id ? { id } : {}) }
                         maxLength = { maxLength }
-                        maxRows = { maxRows }
-                        minRows = { minRows }
                         name = { name }
                         onChange = { handleChange }
                         onKeyPress = { onKeyPress }
@@ -199,7 +196,9 @@ const Input = React.forwardRef<any, IProps>(({
                         readOnly = { readOnly }
                         ref = { ref }
                         required = { required }
-                        value = { value } />
+                        value = { value } 
+                        style = {{ color: 'black' }}
+                        />
                 ) : (
                     <input
                         aria-label = { accessibilityLabel }

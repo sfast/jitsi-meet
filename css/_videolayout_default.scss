@@ -2,7 +2,8 @@
     min-height: 100%;
     position: relative;
     transform: translate3d(0, 0, 0);
-    width: 100%;
+    display: flex;
+    flex: 1;
 }
 
 #layout_wrapper {
